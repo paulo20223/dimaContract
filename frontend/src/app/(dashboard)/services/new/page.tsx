@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { $api } from "@/lib/api-client"
 
 export default function NewServicePage() {
+  useSetPageTitle("Создать услугу")
   const router = useRouter()
   const [form, setForm] = useState({
     name: "",
@@ -34,8 +36,6 @@ export default function NewServicePage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="mb-6 text-2xl font-bold">Создать услугу</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-lg bg-white p-6 shadow">
           <div className="space-y-4">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,6 +32,7 @@ const CLIENT_TYPES = {
 type ClientType = keyof typeof CLIENT_TYPES
 
 export default function EditClientPage() {
+  useSetPageTitle("Редактировать клиента")
   const router = useRouter()
   const params = useParams()
   const clientId = Number(params.id)
@@ -147,8 +149,6 @@ export default function EditClientPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="mb-6 text-2xl font-bold">Редактировать клиента</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-lg bg-white p-6 shadow">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

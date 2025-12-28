@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useQueryState, parseAsInteger } from "nuqs"
 import { Plus, Pencil, Trash2, Download, RefreshCw } from "lucide-react"
 import Link from "next/link"
@@ -22,6 +23,7 @@ import type { components } from "@/lib/api-types"
 type CBRImportResult = components["schemas"]["CBRImportResult"]
 
 export default function BanksPage() {
+  useSetPageTitle("Банки")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [form, setForm] = useState({ name: "", bik: "", correspondent_account: "" })
   const [importResult, setImportResult] = useState<CBRImportResult | null>(null)
@@ -97,8 +99,7 @@ export default function BanksPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Банки</h1>
+      <div className="mb-6 flex justify-end">
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleImportFromCbr} disabled={importMutation.isPending}>
             {importMutation.isPending ? (

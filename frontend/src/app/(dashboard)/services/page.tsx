@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useQueryState, parseAsInteger } from "nuqs"
 import { Plus, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
@@ -10,6 +11,7 @@ import { SearchInput } from "@/components/ui/search-input"
 import { $api } from "@/lib/api-client"
 
 export default function ServicesPage() {
+  useSetPageTitle("Услуги")
   const [search, setSearch] = useQueryState("search", { defaultValue: "" })
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
 
@@ -39,8 +41,7 @@ export default function ServicesPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Услуги</h1>
+      <div className="mb-6 flex justify-end">
         <Button asChild>
           <Link href="/services/new">
             <Plus className="mr-2 h-4 w-4" /> Добавить

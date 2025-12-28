@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { $api } from "@/lib/api-client"
 
 export default function EditBankPage() {
+  useSetPageTitle("Редактировать банк")
   const router = useRouter()
   const params = useParams()
   const bankId = Number(params.id)
@@ -56,8 +58,6 @@ export default function EditBankPage() {
 
   return (
     <div className="max-w-md">
-      <h1 className="mb-6 text-2xl font-bold">Редактировать банк</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-lg bg-white p-6 shadow">
           <div className="space-y-4">

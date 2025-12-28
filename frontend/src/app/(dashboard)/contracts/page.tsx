@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useQueryState, parseAsInteger } from "nuqs"
 import Link from "next/link"
 import { Plus, Download, Pencil } from "lucide-react"
@@ -13,6 +14,7 @@ import type { components } from "@/lib/api-types"
 type Contract = components["schemas"]["ContractResponse"]
 
 export default function ContractsPage() {
+  useSetPageTitle("Договоры")
   const [search, setSearch] = useQueryState("search", { defaultValue: "" })
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
 
@@ -52,8 +54,7 @@ export default function ContractsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Договоры</h1>
+      <div className="mb-6 flex justify-end">
         <Link href="/contracts/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" /> Создать договор

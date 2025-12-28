@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useState } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useQueryState, parseAsInteger } from "nuqs"
 import { Plus, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
@@ -23,6 +24,7 @@ const CLIENT_TYPE_LABELS: Record<string, string> = {
 }
 
 export default function ClientsPage() {
+  useSetPageTitle("Клиенты")
   const [search, setSearch] = useQueryState("search", { defaultValue: "" })
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
@@ -59,8 +61,7 @@ export default function ClientsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Клиенты</h1>
+      <div className="mb-6 flex justify-end">
         <Button asChild>
           <Link href="/clients/new">
             <Plus className="mr-2 h-4 w-4" /> Добавить

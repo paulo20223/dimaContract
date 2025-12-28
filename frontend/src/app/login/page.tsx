@@ -32,7 +32,10 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold">Вход в систему</h1>
+        <h1 className="mb-2 text-center text-3xl font-bold" style={{ color: '#4056a1' }}>
+          LEXAUDIT
+        </h1>
+        <p className="mb-6 text-center text-gray-500">Вход в систему</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="password">Пароль</Label>

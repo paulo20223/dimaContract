@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +13,7 @@ import Link from "next/link"
 import { $api } from "@/lib/api-client"
 
 export default function EditContractPage() {
+  useSetPageTitle("Редактировать договор")
   const router = useRouter()
   const params = useParams()
   const contractId = Number(params.id)
@@ -89,8 +91,6 @@ export default function EditContractPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="mb-6 text-2xl font-bold">Редактировать договор</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-lg bg-white p-6 shadow">
           <div className="grid grid-cols-2 gap-4">

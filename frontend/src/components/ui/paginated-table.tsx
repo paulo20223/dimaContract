@@ -90,9 +90,9 @@ export function PaginatedTable<T extends { id: number }>({
   }
 
   return (
-    <div className="rounded-lg bg-white shadow">
+    <div className="rounded-lg bg-white shadow w-full overflow-hidden">
       {/* Mobile: Cards */}
-      <div className="md:hidden">
+      <div className="md:hidden overflow-hidden">
         {data.length === 0 ? (
           <div className="p-6 text-center text-gray-500">{emptyMessage}</div>
         ) : (
@@ -104,9 +104,9 @@ export function PaginatedTable<T extends { id: number }>({
                 onClick={() => onRowClick?.(item)}
               >
                 {columns.map((col, i) => (
-                  <div key={i} className="flex justify-between gap-2">
-                    <span className="text-sm text-gray-500 shrink-0">{col.header}:</span>
-                    <span className={`text-sm text-right ${col.className ?? ""}`}>
+                  <div key={i} className="flex justify-between gap-2 min-w-0">
+                    <span className="text-sm text-gray-500 truncate min-w-0 shrink-0">{col.header}:</span>
+                    <span className="text-sm text-right truncate min-w-0 flex-1">
                       {getValue(item, col)}
                     </span>
                   </div>

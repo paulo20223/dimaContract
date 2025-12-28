@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -53,6 +54,7 @@ const emptyForm = {
 }
 
 export default function NewClientPage() {
+  useSetPageTitle("Создать клиента")
   const router = useRouter()
   const [form, setForm] = useState(emptyForm)
 
@@ -91,8 +93,6 @@ export default function NewClientPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="mb-6 text-2xl font-bold">Создать клиента</h1>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-lg bg-white p-6 shadow">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
