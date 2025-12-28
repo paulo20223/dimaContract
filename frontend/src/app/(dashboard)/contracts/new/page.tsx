@@ -44,7 +44,7 @@ export default function NewContractPage() {
       alert("Выберите хотя бы одну услугу")
       return
     }
-    const dateStr = form.date.toISOString().split("T")[0]
+    const dateStr = form.contract_date.toISOString().split("T")[0]
     createMutation.mutate({
       body: {
         number: form.number,
@@ -80,7 +80,7 @@ export default function NewContractPage() {
               <Label>Дата <span className="text-red-500">*</span></Label>
               <DatePicker
                 value={form.contract_date}
-                onChange={(date) => date && setForm({ ...form, date })}
+                onChange={(date) => date && setForm({ ...form, contract_date: date })}
               />
             </div>
             <div className="col-span-2 space-y-2">
