@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: agreements
+    ports: [ "5432:5432" ]
+    volumes: [ postgres_data:/var/lib/postgresql/data ]
+
+  app:
+    build: ./backend
+    ports: [ "8000:8000" ]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/agreements
+      AUTH_PASSWORD: secret123
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+    depends_on: [ db ]
+    volumes: [ ./backend:/app ]
+
+volumes:
+  postgres_data:

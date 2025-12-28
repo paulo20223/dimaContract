@@ -1,0 +1,39 @@
+version: '3'
+
+tasks:
+  # Alembic migrations
+  db:up:
+    desc: Apply all migrations
+    aliases: [up]
+    cmd: docker-compose exec app alembic upgrade head
+
+  db:rev:
+    desc: Create new migration
+    aliases: [rev]
+    cmd: docker-compose exec app alembic revision --autogenerate -m "{{.CLI_ARGS}}"
+
+  db:down:
+    desc: Rollback one migration
+    aliases: [down]
+    cmd: docker-compose exec app alembic downgrade -1
+
+  db:history:
+    desc: Show migration history
+    cmd: docker-compose exec app alembic history
+
+  # Docker compose shortcuts
+  up:
+    desc: Start all services
+    cmd: docker-compose up -d
+
+  down:
+    desc: Stop all services
+    cmd: docker-compose down
+
+  logs:
+    desc: Show logs
+    cmd: docker-compose logs -f {{.CLI_ARGS}}
+
+  build:
+    desc: Rebuild containers
+    cmd: docker-compose build
