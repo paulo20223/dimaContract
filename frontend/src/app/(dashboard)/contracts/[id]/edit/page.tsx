@@ -93,7 +93,7 @@ export default function EditContractPage() {
     <div className="max-w-2xl">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-lg bg-white p-6 shadow">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Номер договора <span className="text-red-500">*</span></Label>
               <Input
@@ -110,7 +110,7 @@ export default function EditContractPage() {
                 onChange={(date) => date && setForm({ ...form, date })}
               />
             </div>
-            <div className="col-span-2 space-y-2">
+            <div className="md:col-span-2 space-y-2">
               <div className="flex items-center justify-between">
                 <Label>Клиент <span className="text-red-500">*</span></Label>
                 <Button type="button" variant="ghost" size="sm" asChild>
