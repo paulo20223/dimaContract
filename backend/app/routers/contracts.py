@@ -1,5 +1,6 @@
 from datetime import date
 from io import BytesIO
+from urllib.parse import quote
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select, func, or_
@@ -149,8 +150,13 @@ async def download_contract(contract_id: int, db: AsyncSession = Depends(get_db)
 
     doc_bytes = generate_contract_document(contract)
 
+    filename = f"contract_{contract.number}.docx"
+    encoded_filename = quote(filename, safe='')
+
     return StreamingResponse(
         BytesIO(doc_bytes),
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": f"attachment; filename=contract_{contract.number}.docx"}
+        headers={
+            "Content-Disposition": f"attachment; filename=\"contract.docx\"; filename*=UTF-8''{encoded_filename}"
+        }
     )
