@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
-import { Menu } from "lucide-react"
+import { Menu, Loader2 } from "lucide-react"
 import { Sidebar, SidebarContent } from "@/components/layout/sidebar"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -36,7 +36,15 @@ export default function DashboardLayout({
         </header>
 
         <main className="flex-1 overflow-auto bg-gray-50 p-4 md:p-8">
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <NuqsAdapter>
+            <Suspense fallback={
+              <div className="flex h-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              </div>
+            }>
+              {children}
+            </Suspense>
+          </NuqsAdapter>
         </main>
       </div>
     </div>
