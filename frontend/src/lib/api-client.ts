@@ -4,7 +4,7 @@ import type { paths } from './api-types'
 import { getToken, removeToken } from './auth'
 
 export const client = createClient<paths>({
-  baseUrl: 'http://localhost:8000',
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
 })
 
 client.use({
