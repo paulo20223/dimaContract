@@ -11,7 +11,7 @@ from app.auth import get_current_user
 from app.database import get_db
 from app.models import Contract, Client, Service
 from app.schemas import ContractCreate, ContractUpdate, ContractResponse, ContractListResponse
-from app.document import generate_contract_document
+from app.document import generate_contract_document, generate_contract_pdf
 
 router = APIRouter(prefix="/api/contracts", tags=["contracts"], dependencies=[Depends(get_current_user)])
 
@@ -158,5 +158,31 @@ async def download_contract(contract_id: int, db: AsyncSession = Depends(get_db)
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={
             "Content-Disposition": f"attachment; filename=\"contract.docx\"; filename*=UTF-8''{encoded_filename}"
+        }
+    )
+
+
+@router.get("/{contract_id}/download-pdf")
+async def download_contract_pdf(contract_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(Contract).options(
+            selectinload(Contract.client).selectinload(Client.bank),
+            selectinload(Contract.services)
+        ).where(Contract.id == contract_id)
+    )
+    contract = result.scalar_one_or_none()
+    if not contract:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+
+    pdf_bytes = await generate_contract_pdf(contract)
+
+    filename = f"contract_{contract.number}.pdf"
+    encoded_filename = quote(filename, safe='')
+
+    return StreamingResponse(
+        BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=\"contract.pdf\"; filename*=UTF-8''{encoded_filename}"
         }
     )

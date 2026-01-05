@@ -20,6 +20,10 @@ from .styles import (
     apply_run_font,
     apply_title_style,
     apply_heading_style,
+    apply_table_borders,
+    set_table_width_fixed,
+    set_cell_width,
+    set_cell_margins,
 )
 
 
@@ -56,12 +60,14 @@ class ContractTemplateBuilder:
     def add_city_and_date(self):
         """Добавляет город и дату (г. Москва / дата)"""
         table = self.doc.add_table(rows=1, cols=2)
-        table.autofit = True
-        table.allow_autofit = True
+        table.autofit = False
 
-        # Устанавливаем ширину колонок
-        table.columns[0].width = Inches(3)
-        table.columns[1].width = Inches(3)
+        # Устанавливаем фиксированную ширину таблицы и ячеек (LibreOffice)
+        col_widths = [Cm(8.5).twips, Cm(8.5).twips]
+        set_table_width_fixed(table, col_widths)
+        for row in table.rows:
+            set_cell_width(row.cells[0], col_widths[0])
+            set_cell_width(row.cells[1], col_widths[1])
 
         # Левая ячейка: г. Москва
         cell_left = table.rows[0].cells[0]
@@ -71,6 +77,7 @@ class ContractTemplateBuilder:
 
         # Правая ячейка: «{{day}}» {{date_text}} г.
         cell_right = table.rows[0].cells[1]
+        set_cell_margins(cell_right, right=0)  # Убираем правый отступ
         p = cell_right.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         run = p.add_run("«{{day}}» {{date_text}} г.")
@@ -133,7 +140,16 @@ class ContractTemplateBuilder:
         # Таблица 5 строк x 2 колонки с рамками
         table = self.doc.add_table(rows=5, cols=2)
         table.style = 'Table Grid'
-        table.autofit = True
+        apply_table_borders(table)  # Явные границы для LibreOffice
+        table.autofit = False
+
+        # Устанавливаем фиксированную ширину таблицы и ячеек (LibreOffice)
+        # Ширина контента: 21см (A4) - 3см (лев) - 1.5см (прав) = 16.5см
+        col_widths = [Cm(8.25).twips, Cm(8.25).twips]
+        set_table_width_fixed(table, col_widths)
+        for row in table.rows:
+            set_cell_width(row.cells[0], col_widths[0])
+            set_cell_width(row.cells[1], col_widths[1])
 
         # Строка 1: Заголовки (Исполнитель | Заказчик)
         cell_left = table.rows[0].cells[0]
@@ -240,22 +256,23 @@ class ContractTemplateBuilder:
         # Текст введения
         p = self.doc.add_paragraph()
         run = p.add_run(
-            "На основании Договора возмездного оказания услуг от «{{day}}» {{date_text}} г. "
-            "Исполнитель обязуется:\n"
+            "На основании Договора возмездного оказания услуг от «{{day}}» {{date_text}} г. Исполнитель обязуется:\n"
         )
         apply_run_font(run)
-        apply_body_style(p, first_line_indent=False)
+        apply_body_style(p, first_line_indent=False, alignment=WD_ALIGN_PARAGRAPH.LEFT)
 
         # Таблица услуг (3 колонки: №, Наименование, Стоимость)
         table = self.doc.add_table(rows=2, cols=3)
         table.style = 'Table Grid'
+        apply_table_borders(table)  # Явные границы для LibreOffice
         table.autofit = False
 
-        # Ширина колонок: 1см + равные части для остальных
-        col_widths = [Cm(1), Cm(8), Cm(8)]
+        # Устанавливаем фиксированную ширину таблицы (LibreOffice)
+        col_widths = [Cm(1).twips, Cm(8).twips, Cm(8).twips]
+        set_table_width_fixed(table, col_widths)
         for row in table.rows:
             for idx, width in enumerate(col_widths):
-                row.cells[idx].width = width
+                set_cell_width(row.cells[idx], width)
 
         # Заголовки (первая колонка без заголовка - для номера)
         headers = ["", "Наименование услуги", "Стоимость (руб.) и порядок оплаты"]

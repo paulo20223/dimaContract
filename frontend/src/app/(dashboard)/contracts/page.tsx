@@ -4,7 +4,21 @@ import { useCallback } from "react"
 import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useQueryState, parseAsInteger } from "nuqs"
 import Link from "next/link"
-import { Plus, Download, Pencil } from "lucide-react"
+import { Plus, Pencil } from "lucide-react"
+
+const WordIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="2" width="18" height="20" rx="2" fill="#2B579A" />
+    <path d="M7 7L9.5 17L12 10L14.5 17L17 7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+const PdfIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="2" width="18" height="20" rx="2" fill="#E53935" />
+    <text x="12" y="14" textAnchor="middle" fill="white" fontSize="6" fontWeight="bold" fontFamily="Arial">PDF</text>
+  </svg>
+)
 import { Button } from "@/components/ui/button"
 import { PaginatedTable } from "@/components/ui/paginated-table"
 import { SearchInput } from "@/components/ui/search-input"
@@ -45,6 +59,26 @@ export default function ContractsPage() {
     const link = document.createElement("a")
     link.href = url
     link.setAttribute("download", `contract_${contract.number}.docx`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  }
+
+  const handleDownloadPdf = async (contract: Contract) => {
+    const { data, error } = await client.GET("/api/contracts/{contract_id}/download-pdf", {
+      params: { path: { contract_id: contract.id } },
+      parseAs: "blob",
+    })
+
+    if (error || !data) {
+      alert("Ошибка при скачивании PDF")
+      return
+    }
+
+    const url = window.URL.createObjectURL(data)
+    const link = document.createElement("a")
+    link.href = url
+    link.setAttribute("download", `contract_${contract.number}.pdf`)
     document.body.appendChild(link)
     link.click()
     link.remove()
@@ -98,8 +132,18 @@ export default function ContractsPage() {
               size="icon"
               className="h-9 w-9"
               onClick={() => handleDownload(contract)}
+              title="Скачать DOCX"
             >
-              <Download className="h-6 w-6" />
+              <WordIcon className="h-6 w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9"
+              onClick={() => handleDownloadPdf(contract)}
+              title="Скачать PDF"
+            >
+              <PdfIcon className="h-6 w-6" />
             </Button>
           </div>
         )}

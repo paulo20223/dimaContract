@@ -27,7 +27,6 @@ app.include_router(services.router)
 app.include_router(clients.router)
 app.include_router(contracts.router)
 
-
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}

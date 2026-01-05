@@ -37,3 +37,8 @@ tasks:
   build:
     desc: Rebuild containers
     cmd: docker-compose build
+
+  # Template generation
+  template:
+    desc: Generate contract template
+    cmd: docker-compose exec app python scripts/generate_template.py

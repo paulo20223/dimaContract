@@ -1,13 +1,13 @@
 from io import BytesIO
 from decimal import Decimal
 from docx import Document
-from docx.shared import Pt
 
 from app.models import Contract, CLIENT_TYPES
+
 from .constants import TEMPLATE_PATH
 from .tables import fill_services_table
 from .replacements import replace_in_paragraph, build_replacements, get_full_name, build_requisites
-from .utils import number_to_words_ru
+from .pdf_generator import generate_pdf_document
 
 
 def generate_contract_document(contract: Contract) -> bytes:
@@ -90,3 +90,7 @@ def generate_fallback_document(contract: Contract) -> bytes:
     buffer = BytesIO()
     doc.save(buffer)
     return buffer.getvalue()
+
+
+async def generate_contract_pdf(contract: Contract) -> bytes:
+    return generate_pdf_document(contract)

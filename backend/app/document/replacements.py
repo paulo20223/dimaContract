@@ -17,12 +17,32 @@ ORG_FORMS = {
 
 
 def replace_in_paragraph(paragraph, replacements: dict):
-    """Заменяет метки в параграфе, сохраняя форматирование"""
+    """Заменяет метки в параграфе, объединяя разбитые runs при необходимости.
+
+    Если плейсхолдер типа {{client_header}} разбит на несколько runs
+    (например, '{{client' в одном run и '_header}}' в другом),
+    функция объединяет runs перед заменой.
+    """
     for key, value in replacements.items():
-        if key in paragraph.text:
-            for run in paragraph.runs:
-                if key in run.text:
-                    run.text = run.text.replace(key, str(value or ""))
+        full_text = paragraph.text
+        if key not in full_text:
+            continue
+
+        # Проверяем, есть ли ключ целиком в одном run
+        found_in_single_run = any(key in run.text for run in paragraph.runs)
+
+        if not found_in_single_run and len(paragraph.runs) > 0:
+            # Ключ разбит на несколько runs - объединяем их
+            first_run = paragraph.runs[0]
+            first_run.text = full_text
+            # Удаляем остальные runs
+            for run in list(paragraph.runs[1:]):
+                run._element.getparent().remove(run._element)
+
+        # Теперь заменяем в runs
+        for run in paragraph.runs:
+            if key in run.text:
+                run.text = run.text.replace(key, str(value or ""))
 
 
 def get_full_name(client) -> str:
