@@ -42,3 +42,7 @@ tasks:
   template:
     desc: Generate contract template
     cmd: docker-compose exec app python scripts/generate_template.py
+
+  invoice:
+    desc: Generate invoice template
+    cmd: docker-compose exec app python scripts/generate_invoice.py

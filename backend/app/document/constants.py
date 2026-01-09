@@ -1,6 +1,7 @@
 from pathlib import Path
 
 TEMPLATE_PATH = Path(__file__).parent.parent.parent / "asset" / "template_prepared.docx"
+INVOICE_TEMPLATE_PATH = Path(__file__).parent.parent.parent / "asset" / "invoice_template.xlsx"
 
 MONTHS_RU = {
     1: "января", 2: "февраля", 3: "марта", 4: "апреля",

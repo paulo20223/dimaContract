@@ -12,6 +12,8 @@ from app.database import get_db
 from app.models import Contract, Client, Service
 from app.schemas import ContractCreate, ContractUpdate, ContractResponse, ContractListResponse
 from app.document import generate_contract_document, generate_contract_pdf
+from app.document.invoice_generator import generate_invoice
+from app.document.pdf_generator import generate_invoice_pdf
 
 router = APIRouter(prefix="/api/contracts", tags=["contracts"], dependencies=[Depends(get_current_user)])
 
@@ -184,5 +186,59 @@ async def download_contract_pdf(contract_id: int, db: AsyncSession = Depends(get
         media_type="application/pdf",
         headers={
             "Content-Disposition": f"attachment; filename=\"contract.pdf\"; filename*=UTF-8''{encoded_filename}"
+        }
+    )
+
+
+@router.get("/{contract_id}/invoice")
+async def download_invoice(contract_id: int, db: AsyncSession = Depends(get_db)):
+    """Скачать счёт на оплату в формате Excel"""
+    result = await db.execute(
+        select(Contract).options(
+            selectinload(Contract.client),
+            selectinload(Contract.services)
+        ).where(Contract.id == contract_id)
+    )
+    contract = result.scalar_one_or_none()
+    if not contract:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+
+    invoice_bytes = generate_invoice(contract)
+
+    filename = f"invoice_{contract.number}.xlsx"
+    encoded_filename = quote(filename, safe='')
+
+    return StreamingResponse(
+        BytesIO(invoice_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename=\"invoice.xlsx\"; filename*=UTF-8''{encoded_filename}"
+        }
+    )
+
+
+@router.get("/{contract_id}/invoice-pdf")
+async def download_invoice_pdf(contract_id: int, db: AsyncSession = Depends(get_db)):
+    """Скачать счёт на оплату в формате PDF"""
+    result = await db.execute(
+        select(Contract).options(
+            selectinload(Contract.client),
+            selectinload(Contract.services)
+        ).where(Contract.id == contract_id)
+    )
+    contract = result.scalar_one_or_none()
+    if not contract:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+
+    pdf_bytes = generate_invoice_pdf(contract)
+
+    filename = f"invoice_{contract.number}.pdf"
+    encoded_filename = quote(filename, safe='')
+
+    return StreamingResponse(
+        BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=\"invoice.pdf\"; filename*=UTF-8''{encoded_filename}"
         }
     )
