@@ -5,11 +5,13 @@ from copy import copy
 
 from openpyxl import load_workbook
 from openpyxl.styles import Font
+from openpyxl.drawing.image import Image as XLImage
 
 from app.models import Contract, CLIENT_TYPES
 from .constants import INVOICE_TEMPLATE_PATH, MONTHS_RU
 from .utils import number_to_words_ru
 from .replacements import get_short_name
+from .qr_generator import generate_payment_qr_image
 
 
 def build_client_invoice_line(client) -> str:
@@ -176,6 +178,49 @@ def update_totals(ws, total: Decimal, services_count: int, services_end_row: int
     ws.cell(row=33 + offset, column=2).value = format_price_words(total)
 
 
+def insert_payment_qr(
+    ws,
+    invoice_number: str,
+    invoice_date: str,
+    amount: Decimal,
+    services_end_row: int,
+):
+    """Вставляет QR-код для оплаты в счет.
+
+    Args:
+        ws: Worksheet объект
+        invoice_number: Номер счета
+        invoice_date: Дата счета (DD.MM.YYYY)
+        amount: Сумма к оплате
+        services_end_row: Последняя строка таблицы услуг
+    """
+    # Генерируем QR-код
+    qr_buffer = generate_payment_qr_image(
+        invoice_number=invoice_number,
+        invoice_date=invoice_date,
+        amount=amount,
+        box_size=4,
+        border=2,
+    )
+
+    # Создаем объект изображения для openpyxl
+    qr_image = XLImage(qr_buffer)
+
+    # Устанавливаем размер (~2.5 см x 2.5 см)
+    qr_image.width = 95
+    qr_image.height = 95
+
+    # Вычисляем позицию: в самом низу документа, после подписи
+    # Базовая строка подписи (М.П.): 45
+    # Смещение: services_end_row - 25
+    offset = services_end_row - 25
+    qr_row = 50 + offset  # После подписи с отступом
+
+    # Вставляем в ячейку B
+    cell_anchor = f"B{qr_row}"
+    ws.add_image(qr_image, cell_anchor)
+
+
 def generate_invoice(contract: Contract) -> bytes:
     """Генерирует счет на оплату в формате Excel.
 
@@ -217,6 +262,15 @@ def generate_invoice(contract: Contract) -> bytes:
 
     # Обновляем итоги
     update_totals(ws, total, services_count, services_end_row)
+
+    # Добавляем QR-код для оплаты
+    insert_payment_qr(
+        ws=ws,
+        invoice_number=contract.number,
+        invoice_date=d.strftime("%d.%m.%Y"),
+        amount=total,
+        services_end_row=services_end_row,
+    )
 
     # Сохраняем в байты
     output = BytesIO()
