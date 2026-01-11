@@ -210,15 +210,8 @@ def insert_payment_qr(
     qr_image.width = 95
     qr_image.height = 95
 
-    # Вычисляем позицию: в самом низу документа, после подписи
-    # Базовая строка подписи (М.П.): 45
-    # Смещение: services_end_row - 25
-    offset = services_end_row - 25
-    qr_row = 50 + offset  # После подписи с отступом
-
-    # Вставляем в ячейку B
-    cell_anchor = f"B{qr_row}"
-    ws.add_image(qr_image, cell_anchor)
+    # Вставляем QR-код в фиксированную ячейку BG2
+    ws.add_image(qr_image, "BG3")
 
 
 def generate_invoice(contract: Contract) -> bytes:
