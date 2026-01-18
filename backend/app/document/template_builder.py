@@ -30,8 +30,9 @@ from .styles import (
 class ContractTemplateBuilder:
     """Строитель шаблона договора"""
 
-    def __init__(self):
+    def __init__(self, sections: list[dict] = None):
         self.doc = Document()
+        self.sections = sections if sections is not None else CONTRACT_SECTIONS
         apply_document_defaults(self.doc)
 
     def add_header(self):
@@ -309,8 +310,8 @@ class ContractTemplateBuilder:
         self.add_city_and_date()
         self.add_preamble()
 
-        # Добавляем все разделы из CONTRACT_SECTIONS
-        for section in CONTRACT_SECTIONS:
+        # Добавляем все разделы из секций шаблона
+        for section in self.sections:
             self.add_section(
                 section['number'],
                 section['title'],
@@ -335,9 +336,9 @@ class ContractTemplateBuilder:
         return buffer.getvalue()
 
 
-def generate_template() -> Document:
+def generate_template(sections: list[dict] = None) -> Document:
     """Фабричная функция для создания шаблона"""
-    builder = ContractTemplateBuilder()
+    builder = ContractTemplateBuilder(sections=sections)
     return builder.build()
 
 

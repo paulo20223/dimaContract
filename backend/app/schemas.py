@@ -108,6 +108,7 @@ class ContractBase(BaseModel):
     client_id: int
     contract_date: date | None = None
     service_ids: list[int]
+    template_id: Optional[int] = None
 
 
 class ContractCreate(ContractBase):
@@ -122,6 +123,7 @@ class ContractResponse(BaseModel):
     id: int
     number: str
     client_id: int
+    template_id: Optional[int] = None
     date: date
     created_at: datetime
     client: Optional[ClientResponse] = None
@@ -168,3 +170,44 @@ class CBRImportResult(BaseModel):
     errors: int
     error_messages: list[str] = []
     import_date: datetime
+
+
+# Template
+class TemplateSectionSchema(BaseModel):
+    number: Optional[int] = None
+    title: str
+    paragraphs: list[str]
+
+
+class TemplateCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    sections: list[TemplateSectionSchema]
+    is_default: bool = False
+
+
+class TemplateUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    sections: Optional[list[TemplateSectionSchema]] = None
+    is_default: Optional[bool] = None
+
+
+class TemplateResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
+    sections: list[TemplateSectionSchema]
+    is_default: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TemplateListResponse(BaseModel):
+    items: list[TemplateResponse]
+    total: int
+    page: int
+    pages: int

@@ -8,13 +8,19 @@ from .constants import TEMPLATE_PATH
 from .tables import fill_services_table
 from .replacements import replace_in_paragraph, build_replacements, get_full_name, build_requisites
 from .pdf_generator import generate_pdf_document
+from .template_builder import ContractTemplateBuilder
 
 
 def generate_contract_document(contract: Contract) -> bytes:
-    if not TEMPLATE_PATH.exists():
-        return generate_fallback_document(contract)
+    # Получаем секции из шаблона контракта или используем None (будут дефолтные)
+    sections = None
+    if contract.template and contract.template.sections:
+        sections = contract.template.sections
 
-    doc = Document(TEMPLATE_PATH)
+    # Создаём документ программно через builder
+    builder = ContractTemplateBuilder(sections=sections)
+    doc = builder.build()
+
     total = fill_services_table(doc, contract.services)
     replacements = build_replacements(contract, total)
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSetPageTitle } from "@/hooks/use-set-page-title"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ClientCombobox } from "@/components/ui/client-combobox"
 import { DatePicker } from "@/components/ui/date-picker"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import { $api } from "@/lib/api-client"
@@ -20,9 +27,21 @@ export default function NewContractPage() {
     client_id: "",
     contract_date: new Date(),
     service_ids: [] as number[],
+    template_id: null as number | null,
   })
 
   const { data: servicesData, isLoading: servicesLoading } = $api.useQuery("get", "/api/services")
+  const { data: templatesData } = $api.useQuery("get", "/api/templates")
+  const { data: defaultTemplate } = $api.useQuery("get", "/api/templates/default")
+
+  const templates = templatesData?.items ?? []
+
+  // Устанавливаем шаблон по умолчанию
+  useEffect(() => {
+    if (defaultTemplate && form.template_id === null) {
+      setForm((prev) => ({ ...prev, template_id: defaultTemplate.id }))
+    }
+  }, [defaultTemplate, form.template_id])
 
   const services = servicesData?.items ?? []
 
@@ -53,6 +72,7 @@ export default function NewContractPage() {
         client_id: parseInt(form.client_id),
         contract_date: dateStr,
         service_ids: form.service_ids,
+        template_id: form.template_id,
       },
     })
   }
@@ -97,6 +117,34 @@ export default function NewContractPage() {
                 value={form.client_id}
                 onChange={(value) => setForm({ ...form, client_id: value })}
               />
+            </div>
+            <div className="md:col-span-2 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Шаблон договора</Label>
+                <Button type="button" variant="ghost" size="sm" asChild>
+                  <Link href="/templates/new">
+                    <Plus className="mr-1 h-4 w-4" />
+                    Создать шаблон
+                  </Link>
+                </Button>
+              </div>
+              <Select
+                value={form.template_id?.toString() || ""}
+                onValueChange={(value) =>
+                  setForm({ ...form, template_id: value ? parseInt(value) : null })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите шаблон" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((t) => (
+                    <SelectItem key={t.id} value={t.id.toString()}>
+                      {t.name} {t.is_default && "(по умолчанию)"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

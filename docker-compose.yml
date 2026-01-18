@@ -10,7 +10,7 @@ services:
 
   app:
     build: ./backend
-    ports: [ "8000:8000" ]
+    ports: [ "8001:8001" ]
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/agreements
       AUTH_PASSWORD: secret123

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Building2, FileText, Users, Wrench, LogOut } from "lucide-react"
+import { Building2, FileText, Users, Wrench, LogOut, FileCode2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { removeToken } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,7 @@ const navigation = [
   { name: "Договоры", href: "/contracts", icon: FileText },
   { name: "Клиенты", href: "/clients", icon: Users },
   { name: "Услуги", href: "/services", icon: Wrench },
+  { name: "Шаблоны", href: "/templates", icon: FileCode2 },
   { name: "Банки", href: "/banks", icon: Building2 },
 ]
 

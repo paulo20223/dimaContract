@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
-from app.routers import auth, banks, services, clients, contracts
+from app.routers import auth, banks, services, clients, contracts, templates
 
 
 @asynccontextmanager
@@ -15,7 +15,7 @@ app = FastAPI(title="Contract Generator API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://lexaudit.tenzorro.com"],
+    allow_origins=["http://localhost:3000", "https://lexaudit.tenzorro.com", "http://localhost:3001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,6 +26,7 @@ app.include_router(banks.router)
 app.include_router(services.router)
 app.include_router(clients.router)
 app.include_router(contracts.router)
+app.include_router(templates.router)
 
 @app.get("/api/health")
 async def health():

@@ -2,6 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 from sqlalchemy import ForeignKey, String, Text, Numeric, Date, DateTime, Table, Column, Integer
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -87,16 +88,32 @@ class Client(Base):
     contracts: Mapped[list["Contract"]] = relationship(back_populates="client")
 
 
+class Template(Base):
+    __tablename__ = "templates"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    sections: Mapped[dict] = mapped_column(JSON)
+    is_default: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    contracts: Mapped[list["Contract"]] = relationship(back_populates="template")
+
+
 class Contract(Base):
     __tablename__ = "contracts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     number: Mapped[str] = mapped_column(String(50), unique=True)
     client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"))
+    template_id: Mapped[Optional[int]] = mapped_column(ForeignKey("templates.id"), nullable=True)
     date: Mapped[date] = mapped_column(Date, default=date.today)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     client: Mapped["Client"] = relationship(back_populates="contracts")
+    template: Mapped[Optional["Template"]] = relationship(back_populates="contracts")
     services: Mapped[list["Service"]] = relationship(
         secondary=contract_services, back_populates="contracts"
     )

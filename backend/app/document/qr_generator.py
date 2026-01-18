@@ -24,7 +24,7 @@ def build_payment_qr_data(
         amount: Сумма к оплате в рублях
 
     Returns:
-        Строка данных для QR-кода в формате ST00011
+        Строка данных для QR-кода в формате ST00012
     """
     # Конвертируем сумму в копейки (целое число)
     amount_kopecks = int(amount * 100)
@@ -34,7 +34,7 @@ def build_payment_qr_data(
 
     # Собираем данные в формате ГОСТ
     fields = [
-        "ST00011",  # Версия 0001 + кодировка Windows-1251
+        "ST00012",  # Версия 0001 + кодировка UTF-8
         f"Name=ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ ЗИНЗИРОВ ДМИТРИЙ БОРИСОВИЧ",
         f"PersonalAcc={EXECUTOR_DATA['settlement_account']}",
         f"BankName={EXECUTOR_DATA['bank_name']}",
@@ -72,9 +72,6 @@ def generate_payment_qr_image(
     # Формируем данные
     qr_data = build_payment_qr_data(invoice_number, invoice_date, amount)
 
-    # Кодируем в Windows-1251 для минимального размера QR
-    encoded_data = qr_data.encode("windows-1251")
-
     # Создаем QR-код
     qr = qrcode.QRCode(
         version=None,  # Автоматический выбор версии
@@ -82,7 +79,8 @@ def generate_payment_qr_image(
         box_size=box_size,
         border=border,
     )
-    qr.add_data(encoded_data)
+    # Передаём строку напрямую - qrcode автоматически закодирует в UTF-8
+    qr.add_data(qr_data)
     qr.make(fit=True)
 
     # Генерируем изображение

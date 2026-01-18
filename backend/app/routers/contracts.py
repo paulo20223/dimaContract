@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Contract, Client, Service
+from app.models import Contract, Client, Service, Template
 from app.schemas import ContractCreate, ContractUpdate, ContractResponse, ContractListResponse
 from app.document import generate_contract_document, generate_contract_pdf
 from app.document.invoice_generator import generate_invoice
@@ -68,9 +68,16 @@ async def create_contract(data: ContractCreate, db: AsyncSession = Depends(get_d
     if len(services) != len(data.service_ids):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Some services not found")
 
+    # Проверяем template_id если передан
+    if data.template_id:
+        template_result = await db.execute(select(Template).where(Template.id == data.template_id))
+        if not template_result.scalar_one_or_none():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+
     contract = Contract(
         number=data.number,
         client_id=data.client_id,
+        template_id=data.template_id,
         date=data.contract_date or date.today()
     )
     contract.services = list(services)
@@ -121,8 +128,15 @@ async def update_contract(contract_id: int, data: ContractUpdate, db: AsyncSessi
     if len(services) != len(data.service_ids):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Some services not found")
 
+    # Проверяем template_id если передан
+    if data.template_id:
+        template_result = await db.execute(select(Template).where(Template.id == data.template_id))
+        if not template_result.scalar_one_or_none():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+
     contract.number = data.number
     contract.client_id = data.client_id
+    contract.template_id = data.template_id
     contract.date = data.contract_date or contract.date
     contract.services = list(services)
 
@@ -143,7 +157,8 @@ async def download_contract(contract_id: int, db: AsyncSession = Depends(get_db)
     result = await db.execute(
         select(Contract).options(
             selectinload(Contract.client).selectinload(Client.bank),
-            selectinload(Contract.services)
+            selectinload(Contract.services),
+            selectinload(Contract.template)
         ).where(Contract.id == contract_id)
     )
     contract = result.scalar_one_or_none()
@@ -169,7 +184,8 @@ async def download_contract_pdf(contract_id: int, db: AsyncSession = Depends(get
     result = await db.execute(
         select(Contract).options(
             selectinload(Contract.client).selectinload(Client.bank),
-            selectinload(Contract.services)
+            selectinload(Contract.services),
+            selectinload(Contract.template)
         ).where(Contract.id == contract_id)
     )
     contract = result.scalar_one_or_none()
