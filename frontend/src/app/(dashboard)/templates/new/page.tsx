@@ -40,7 +40,7 @@ export default function NewTemplatePage() {
     if (defaultTemplate?.sections && defaultTemplate.sections.length > 0) {
       setSections(
         defaultTemplate.sections.map((s) => ({
-          number: s.number,
+          number: s.number ?? null,
           title: s.title,
           paragraphs: [...s.paragraphs],
         }))

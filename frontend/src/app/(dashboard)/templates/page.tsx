@@ -23,8 +23,8 @@ export default function TemplatesPage() {
 
   const deleteMutation = $api.useMutation("delete", "/api/templates/{template_id}", {
     onSuccess: () => refetch(),
-    onError: (error: { detail?: string }) => {
-      alert(error?.detail || "Ошибка при удалении шаблона")
+    onError: () => {
+      alert("Ошибка при удалении шаблона")
     },
   })
 
