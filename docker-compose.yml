@@ -19,6 +19,10 @@ services:
     volumes:
       - ./backend:/app
 
+  frontend:
+    build: ./frontend
+    expose: [ 3000 ]
+    env_file: [ ./frontend/.env ]
 
 networks:
   app:
